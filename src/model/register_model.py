@@ -59,7 +59,11 @@ def register_model(model_name: str, model_info: dict):
         model_uri = f"runs:/{model_info['run_id']}/{model_info['model_path']}"
         
         # Register the model
-        model_version = mlflow.register_model(model_uri, model_name)
+        client = mlflow.tracking.MlflowClient()
+
+        model_version = client.create_model_version(name=model_name,
+                                                    source=f"{dagshub_url}/{repo_owner}/{repo_name}.mlflow/artifacts/{model_info['run_id']}/artifacts/{model_info['model_path']}",
+                                                    run_id=model_info['run_id'])
         
         # Transition the model to "Staging" stage
         client = mlflow.tracking.MlflowClient()
